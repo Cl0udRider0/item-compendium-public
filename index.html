@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Item Design Vault — Public Preview</title>
+<meta name="description" content="A peek at items being designed for a custom fighting game.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=JetBrains+Mono:wght@400;500&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:      #0d0f14;
+    --surface: #13161e;
+    --raised:  #1a1e2a;
+    --border:  #2a2f3f;
+    --border2: #363c52;
+    --text:    #d4cfc5;
+    --muted:   #6b7080;
+    --accent:  #c9a84c;
+    --slot-melee:    #c45c5c;
+    --slot-ranged:   #4f8bc4;
+    --slot-misc:     #8b6fd4;
+    --rarity-public: #5c9e72;
+    --rarity-secret: #c9a84c;
+    --rarity-admin:  #c45c5c;
+    --font-display: 'Cinzel', serif;
+    --font-body:    'Crimson Pro', serif;
+    --font-mono:    'JetBrains Mono', monospace;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-body); font-size: 16px; line-height: 1.6; min-height: 100vh; }
+  body::before { content: ''; position: fixed; inset: 0; background-image: radial-gradient(ellipse 80% 50% at 20% 10%, rgba(139,111,212,0.06) 0%, transparent 60%), radial-gradient(ellipse 60% 40% at 80% 80%, rgba(201,168,76,0.05) 0%, transparent 50%); pointer-events: none; z-index: 0; }
+
+  .wrap { position: relative; z-index: 1; max-width: 1300px; margin: 0 auto; padding: 0 2rem 4rem; }
+
+  /* ── HEADER ── */
+  header { border-bottom: 1px solid var(--border); padding: 2rem 0 1.5rem; margin-bottom: 2rem; }
+  .header-inner { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+  .logo-area h1 { font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; letter-spacing: 0.06em; color: var(--accent); text-transform: uppercase; line-height: 1; }
+  .logo-area .tagline { font-family: var(--font-mono); font-size: 0.68rem; color: var(--muted); letter-spacing: 0.1em; margin-top: 6px; }
+  .header-right { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
+  .stat-pill { font-family: var(--font-mono); font-size: 0.68rem; color: var(--muted); letter-spacing: 0.08em; text-align: right; }
+  .stat-pill strong { color: var(--text); font-size: 1.05rem; display: block; font-weight: 500; }
+
+  /* ── STATUS BAR ── */
+  .status-bar { display: flex; align-items: center; gap: 0.75rem; padding: 0.55rem 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 7px; margin-bottom: 1.5rem; font-family: var(--font-mono); font-size: 0.68rem; color: var(--muted); letter-spacing: 0.06em; }
+  .status-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .dot-ok      { background: #5c9e72; box-shadow: 0 0 5px #5c9e72; }
+  .dot-loading { background: var(--accent); animation: pulse 1s ease-in-out infinite; }
+  .dot-error   { background: #c45c5c; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .status-label { color: var(--text); }
+  .status-spacer { flex: 1; }
+  .status-meta { color: var(--muted); font-size: 0.63rem; }
+  .ro-badge { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.08em; padding: 3px 8px; border-radius: 3px; border: 1px solid var(--border2); color: var(--muted); text-transform: uppercase; }
+
+  /* ── TOOLBAR ── */
+  .toolbar { display: flex; gap: 0.75rem; margin-bottom: 1.75rem; flex-wrap: wrap; align-items: center; }
+  .search-box { flex: 1; min-width: 200px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 0.55rem 1rem; font-family: var(--font-body); font-size: 0.95rem; color: var(--text); outline: none; transition: border-color 0.2s; }
+  .search-box::placeholder { color: var(--muted); }
+  .search-box:focus { border-color: var(--border2); }
+  .filter-row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .filter-btn { font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.08em; padding: 0.38rem 0.8rem; border-radius: 4px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; transition: all 0.15s; text-transform: uppercase; }
+  .filter-btn:hover { border-color: var(--border2); color: var(--text); }
+  .filter-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(201,168,76,0.08); }
+
+  /* ── GRID ── */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.25rem; }
+
+  /* ── CARD ── */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; transition: border-color 0.2s, transform 0.2s; animation: fadeIn 0.3s ease both; }
+  .card:hover { border-color: var(--border2); transform: translateY(-2px); }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+  .card-top { padding: 1rem 1.2rem 0.85rem; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 0.85rem; }
+  .card-icon { width: 42px; height: 42px; border-radius: 8px; border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; background: var(--raised); }
+  .card-meta { flex: 1; min-width: 0; }
+  .card-name { font-family: var(--font-display); font-size: 0.9rem; font-weight: 600; color: #ede8de; letter-spacing: 0.03em; line-height: 1.3; word-break: break-word; }
+  .card-source { font-family: var(--font-mono); font-size: 0.62rem; color: var(--muted); letter-spacing: 0.08em; margin-top: 3px; }
+  .tag-row { display: flex; gap: 4px; margin-top: 6px; flex-wrap: wrap; }
+  .tag { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.06em; padding: 2px 6px; border-radius: 3px; border: 1px solid; text-transform: uppercase; }
+  .tag-melee  { color: var(--slot-melee);    border-color: var(--slot-melee);    background: rgba(196,92,92,0.1); }
+  .tag-ranged { color: var(--slot-ranged);   border-color: var(--slot-ranged);   background: rgba(79,139,196,0.1); }
+  .tag-misc   { color: var(--slot-misc);     border-color: var(--slot-misc);     background: rgba(139,111,212,0.1); }
+  .tag-public { color: var(--rarity-public); border-color: var(--rarity-public); background: rgba(92,158,114,0.1); }
+  .tag-secret { color: var(--rarity-secret); border-color: var(--rarity-secret); background: rgba(201,168,76,0.1); }
+  .tag-admin  { color: var(--rarity-admin);  border-color: var(--rarity-admin);  background: rgba(196,92,92,0.1); }
+  .tag-idea   { color: var(--muted); border-color: var(--border2); background: rgba(54,60,82,0.25); }
+  .tag-implemented { color: #5c9e72; border-color: #5c9e72; background: rgba(92,158,114,0.12); }
+  .card-body { padding: 0.85rem 1.2rem; flex: 1; display: flex; flex-direction: column; gap: 0.65rem; }
+  .card-desc { font-size: 0.88rem; color: var(--muted); font-style: italic; line-height: 1.55; }
+  .abilities { display: flex; flex-direction: column; gap: 3px; }
+  .ability-row { display: grid; grid-template-columns: auto 1fr; gap: 7px; align-items: baseline; font-size: 0.86rem; }
+  .ability-trigger { font-family: var(--font-mono); font-size: 0.6rem; padding: 2px 5px; border-radius: 3px; background: var(--raised); border: 1px solid var(--border2); color: var(--muted); white-space: nowrap; letter-spacing: 0.04em; }
+  .ability-text { color: var(--text); line-height: 1.45; }
+  .card-unlock { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.04em; color: var(--muted); }
+  .card-unlock em { color: var(--accent); opacity: 0.7; font-style: normal; }
+
+  /* ── EMPTY / LOADING ── */
+  .empty { grid-column: 1/-1; padding: 4rem 2rem; text-align: center; color: var(--muted); font-style: italic; }
+  .skeleton { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; height: 220px; animation: shimmer 1.4s ease-in-out infinite; }
+  @keyframes shimmer { 0%,100%{opacity:0.4} 50%{opacity:0.7} }
+
+  /* ── FOOTER ── */
+  footer { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); font-family: var(--font-mono); font-size: 0.65rem; color: var(--muted); letter-spacing: 0.08em; text-align: center; line-height: 2; }
+
+  ::-webkit-scrollbar { width: 5px; } ::-webkit-scrollbar-track { background: var(--bg); } ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="header-inner">
+      <div class="logo-area">
+        <h1>Item Design Vault</h1>
+        <div class="tagline">// Public preview · Work in progress</div>
+      </div>
+      <div class="header-right">
+        <div class="stat-pill"><strong id="count-total">—</strong>items shown</div>
+        <div class="stat-pill"><strong id="count-public">—</strong>public</div>
+        <div class="stat-pill"><strong id="count-secret">—</strong>secret</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="status-bar">
+    <div class="status-dot dot-loading" id="status-dot"></div>
+    <span class="status-label" id="status-label">Fetching vault…</span>
+    <div class="status-spacer"></div>
+    <span class="status-meta" id="status-meta"></span>
+    <span class="ro-badge">Read only</span>
+  </div>
+
+  <div class="toolbar">
+    <input class="search-box" type="text" id="search" placeholder="Search items, sources, tags…" oninput="render()">
+    <div class="filter-row">
+      <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+      <button class="filter-btn" onclick="setFilter('melee',this)">Melee</button>
+      <button class="filter-btn" onclick="setFilter('ranged',this)">Ranged</button>
+      <button class="filter-btn" onclick="setFilter('misc',this)">Misc</button>
+      <button class="filter-btn" onclick="setFilter('secret',this)">Secret</button>
+    </div>
+  </div>
+
+  <div class="grid" id="grid">
+    <div style="grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1.25rem">
+      <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+    </div>
+  </div>
+
+  <footer>
+    Item Design Vault · Public Preview · Data served live from the design Gist · Items shown here are selected by the author
+  </footer>
+</div>
+
+<script>
+const GIST_ID   = '6633ed251ca25aa3516794ecd1af9f3d';
+const GIST_FILE = 'items_vault.json';
+const API_URL   = 'https://api.github.com/gists/' + GIST_ID;
+
+let items  = [];
+let filter = 'all';
+
+/* ── FETCH ── */
+async function fetchVault() {
+  setStatus('loading', 'Fetching vault…');
+  try {
+    const res = await fetch(API_URL, {
+      headers: { 'Accept': 'application/vnd.github+json' }
+    });
+    if (!res.ok) throw new Error('GitHub API: HTTP ' + res.status);
+
+    const data     = await res.json();
+    const fileData = data.files && data.files[GIST_FILE];
+    if (!fileData) throw new Error('File not found in Gist');
+
+    const rawRes = await fetch(fileData.raw_url, { cache: 'no-store' });
+    if (!rawRes.ok) throw new Error('raw_url fetch failed');
+
+    const json = await rawRes.json();
+
+    // Only show items flagged as public_visible
+    items = (json.items || []).filter(i => i.public_visible === true);
+
+    render();
+
+    const ver = (json._meta && json._meta.version) || '?';
+    setStatus('ok', 'Live — v' + ver + ' · ' + items.length + ' items visible');
+    document.getElementById('status-meta').textContent = new Date().toLocaleTimeString();
+  } catch(e) {
+    setStatus('error', 'Could not load vault: ' + e.message);
+  }
+}
+
+/* ── RENDER ── */
+function render() {
+  const q    = document.getElementById('search').value.toLowerCase();
+  const grid = document.getElementById('grid');
+
+  const visible = items.filter(item => {
+    const matchFilter = filter === 'all' || filter === item.slot || filter === item.rarity;
+    const searchIn = [item.name, item.source, item.desc, ...(item.tags||[])].join(' ').toLowerCase();
+    return matchFilter && (!q || searchIn.includes(q));
+  });
+
+  grid.innerHTML = visible.length
+    ? visible.map(cardHTML).join('')
+    : '<div class="empty">No items match.</div>';
+
+  document.getElementById('count-total').textContent  = visible.length;
+  document.getElementById('count-public').textContent = items.filter(i=>i.rarity==='public').length;
+  document.getElementById('count-secret').textContent = items.filter(i=>i.rarity==='secret').length;
+}
+
+function cardHTML(item) {
+  const abs = (item.abilities||[]).map(a => `
+    <div class="ability-row">
+      <span class="ability-trigger">${esc(a.trigger)}</span>
+      <span class="ability-text">${esc(a.text)}</span>
+    </div>`).join('');
+
+  const tagHtml = (item.tags||[]).slice(0,3).map(t =>
+    `<span class="tag" style="color:var(--muted);border-color:var(--border2)">${esc(t)}</span>`
+  ).join('');
+
+  const implBadge = item.implemented === true
+    ? `<span class="tag tag-implemented">✓ implemented</span>`
+    : `<span class="tag tag-idea">○ idea</span>`;
+
+  return `<div class="card">
+    <div class="card-top">
+      <div class="card-icon">${item.icon||'⚔️'}</div>
+      <div class="card-meta">
+        <div class="card-name">${esc(item.name)}</div>
+        <div class="card-source">${esc(item.source||'')}</div>
+        <div class="tag-row">
+          <span class="tag tag-${item.slot}">${esc(item.slot)}</span>
+          <span class="tag tag-${item.rarity}">${esc(item.rarity)}</span>
+          ${implBadge}
+          ${tagHtml}
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      ${item.desc?`<div class="card-desc">${esc(item.desc)}</div>`:''}
+      ${abs?`<div class="abilities">${abs}</div>`:''}
+      ${item.unlock?`<div class="card-unlock"><em>UNLOCK</em> ${esc(item.unlock)}</div>`:''}
+    </div>
+  </div>`;
+}
+
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ── FILTER ── */
+function setFilter(f, btn) {
+  filter = f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+/* ── STATUS ── */
+function setStatus(state, label) {
+  const dot = document.getElementById('status-dot');
+  const lbl = document.getElementById('status-label');
+  dot.className = 'status-dot';
+  if (state === 'loading') { dot.classList.add('dot-loading'); lbl.style.color = 'var(--accent)'; }
+  else if (state === 'ok')  { dot.classList.add('dot-ok');      lbl.style.color = '#5c9e72'; }
+  else                      { dot.classList.add('dot-error');    lbl.style.color = '#c45c5c'; }
+  lbl.textContent = label;
+}
+
+fetchVault();
+</script>
+</body>
+</html>
